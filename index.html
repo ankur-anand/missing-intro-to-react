@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+  <title>Need Of React</title>
+</head>
+<body>
+  <div class="wrapper">
+
+
+  </div>
+  <script>
+  const createDOMFromString = domstring => {
+  const div = document.createElement("div");
+  div.innerHTML = domstring;
+  return div;
+};
+
+class Component {
+  constructor(props) {
+    this.props = props;
+  }
+  setState(state) {
+    const oldElem = this.elem;
+    this.state = state;
+    this._renderDOM();
+    if (this.onStateChange) this.onStateChange(oldElem, this.elem);
+  }
+
+  _renderDOM() {
+    this.elem = createDOMFromString(this.render());
+    if (this.onClick) {
+      this.elem.addEventListener("click", this.onClick.bind(this));
+    }
+    return this.elem;
+  }
+}
+
+class UpVoteButton extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { isUpVoted: false };
+  }
+
+  onClick() {
+    this.setState({
+      isUpVoted: !this.state.isUpVoted
+    });
+  }
+
+  render() {
+    return `
+      <button class='upvote-btn' style="background: ${this.props.bgColor}">
+      <span class='upvote-text'>${
+        this.state.isUpVoted ? "Cancel" : "UpVote"
+      }</span>
+      <span><i class="fa fa-thumbs-up" aria-hidden="true"></i></span>
+      </button>
+    `;
+  }
+}
+
+class DownVoteButton extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isDownVoted: false
+    };
+  }
+
+  onClick() {
+    this.setState({
+      isDownVoted: !this.state.isDownVoted
+    });
+  }
+  render() {
+    return `
+      <button class="downvote-btn" style="background: ${this.props.bgColor}">
+      <span class="downvote-text">${
+        this.state.isDownVoted ? "Cancel" : "Downvote"
+      }</span>
+      <span><i class="fa fa-thumbs-down" aria-hidden="true"></i></span>
+      </button>
+      `;
+  }
+}
+
+const componentMount = (component, container) => {
+  container.appendChild(component._renderDOM());
+  component.onStateChange = (oldElem, newElem) => {
+    container.insertBefore(newElem, oldElem);
+    container.removeChild(oldElem);
+  };
+};
+
+const wrapper = document.querySelector(".wrapper");
+const upVoteButton = new UpVoteButton({ bgColor: "green" });
+const downVoteButton = new DownVoteButton({ bgColor: "red" });
+componentMount(upVoteButton, wrapper);
+componentMount(downVoteButton, wrapper);
+</script>
+</body>
+</html>
